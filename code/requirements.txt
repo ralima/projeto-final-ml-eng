@@ -9,4 +9,4 @@ pycaret==3.2
 streamlit==1.28
 matplotlib==3.6
 mlflow==2.11
-
+seaborn==0.13.0

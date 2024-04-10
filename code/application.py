@@ -38,35 +38,3 @@ with mlflow.start_run(experiment_id=experiment_id, run_name = 'PipelineAplicacao
     
     print(data_prod)
     
-#     (retrain, [specificity_m, sensibility_m, precision_m],
-#               [specificity_t, sensibility_t, precision_t] ) = alarm(data_novelty, pred_holdout, min_eff_alarm)
-#     if retrain:
-#         print('==> RETREINAMENTO NECESSARIO')
-#     else:
-#         print('==> RETREINAMENTO NAO NECESSARIO')
-#     # LOG DE PARAMETROS DO MODELO
-#     mlflow.log_param("min_eff_alarm", min_eff_alarm)
-
-#     # LOG DE METRICAS GLOBAIS
-#     mlflow.log_metric("Alarme Retreino", float(retrain))
-#     mlflow.log_metric("Especificidade Controle", specificity_m)
-#     mlflow.log_metric("Sensibilidade Controle", sensibility_m)
-#     mlflow.log_metric("Precisao Controle", precision_m)
-#     mlflow.log_metric("Especificidade Teste", specificity_t)
-#     mlflow.log_metric("Sensibilidade Teste", sensibility_t)
-#     mlflow.log_metric("Precisao Teste", precision_t)
-#     # LOG ARTEFATO
-#     var_name = 'volatile acidity' # 'alcohol'
-#     data_drift_alarm(var_name, data_wine, pred_holdout, data_novelty)
-#     plot_path = f'novidade_datadrift_{var_name}.png'
-#     plt.savefig(plot_path)
-#     mlflow.log_artifact(plot_path)
-
-#     # LOG ARTEFATO
-#     var_name = 'alcohol'
-#     data_drift_alarm(var_name, data_wine, pred_holdout, data_novelty)
-#     plot_path = f'novidade_datadrift_{var_name}.png'
-#     plt.savefig(plot_path)
-#     mlflow.log_artifact(plot_path)
-
-# mlflow.end_run() 
