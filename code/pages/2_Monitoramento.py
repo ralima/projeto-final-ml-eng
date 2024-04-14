@@ -14,7 +14,7 @@ st.set_page_config(
     page_title='Predicção de Arremeços do Kobe Bryant - Monitoramento',
     page_icon=':basketball:',
 )
-st.title("Monitoramento Modelo em produção")
+st.title("Monitoramento do Modelo em produção")
 
 ################ Lida com os dados
 prod_file = '../data/processed/prediction_prod.parquet'
@@ -22,8 +22,8 @@ df_prod = pd.read_parquet(prod_file)
 df_prod = df_prod.dropna()
 
 # Função para plotar a distribuição das previsões
-def plot_predictions(df_prod):
-    fignum = plt.figure(figsize=(10,6))
+def plot_previsoes(df_prod):
+    fignum = plt.figure(figsize=(8,6))
     sns.histplot(df_prod['predict_score'], color="red", label='Produção', kde=True)
     plt.title('Distribuição das Probabilidades de Arremesso - Prod')
     plt.xlabel('Probabilidade de Acertar a Cesta')
@@ -32,60 +32,54 @@ def plot_predictions(df_prod):
     st.pyplot(fignum)
     
 # Função para mostrar a matriz de confusão
-def show_confusion_matrix(df):
-    
-    # Convertendo os escores de previsão em classes preditas
-    # predicted_classes = (data_clean['predict_score'] > 0.5).astype(int)
-    # cm = metrics.confusion_matrix(df['shot_made_flag'], predicted_classes)
-    # st.write('Matriz de Confusão:')
-    # st.dataframe(cm)
-    
-    ##### ---
-    # Remove linhas com NaN na coluna 'shot_made_flag'
-    fignum = plt.figure(figsize=(6,4))
-    
-    data_clean = df.dropna(subset=['shot_made_flag'])
+def plot_matriz_confusao(data_prod):
+    fignum = plt.figure(figsize=(8,6))
+    data_clean = data_prod.dropna(subset=['shot_made_flag'])
     
     # Convertendo os escores de previsão em classes preditas
     predicted_classes = (data_clean['predict_score'] > 0.5).astype(int)
     
     cm = confusion_matrix(data_clean['shot_made_flag'], predicted_classes)
     
-    plt.figure(figsize=(10, 8))
     sns.heatmap(cm, annot=True, fmt="d")
     plt.title('Matriz de Confusão - Modelo de Produção')
     plt.xlabel('Predito')
     plt.ylabel('Verdadeiro')
 
     st.pyplot(fignum)
-    plt.close()
 
-# Função para criar e mostrar a ROC Curve
-def plot_roc_curve(df):
-    fignum = plt.figure(figsize=(10,6))
+
+# Função para criar e mostrar a Curva ROC
+def plot_curva_roc(df):
+    fignum = plt.figure(figsize=(8,6))
     fpr, tpr, _ = roc_curve(df['shot_made_flag'], df['predict_score'])
     roc_auc = auc(fpr, tpr)
-    #plt.figure(figsize=(8, 6))
     plt.plot(fpr, tpr, color='darkorange', label=f'ROC curve (area = {roc_auc:0.2f})')
     plt.plot([0, 1], [0, 1], color='navy', linestyle='--')
-    plt.xlabel('False Positive Rate')
-    plt.ylabel('True Positive Rate')
-    plt.title('Receiver Operating Characteristic')
+    plt.xlabel('Taxa de Falsos Positivos')
+    plt.ylabel('Taxa de Verdadeiros Positivos')
+    plt.title('Curva ROC')
     plt.legend(loc="lower right")
     st.pyplot(fignum)
     
+def plot_residual(df):
+    # Residual Plot (Normalmente mais aplicável a regressão)
+    residuals = df['shot_made_flag'] - df['predict_score']
+    fig, ax = plt.subplots()
+    sns.residplot(x=df['predict_score'], y=residuals, lowess=True, ax=ax, line_kws={'color': 'red', 'lw': 1})
+    #sns.residplot(x=df['predict_score'], y=residuals, lowess=True, line_kws={'color': 'red', 'lw': #1})
+    plt.title('Residual Plot')
+    plt.xlabel('Probabilidades previstas')
+    plt.ylabel('Residuais')
+    plt.legend(loc="upper right")
+    st.pyplot(fig)
+    
+col1, col2 = st.columns(2)
+with col1:
+    plot_previsoes(df_prod)
+    plot_residual(df_prod)
+with col2:
+    plot_curva_roc(df_prod)
+    plot_matriz_confusao(df_prod)
 
-st.markdown('#### plot predictions')
-plot_predictions(df_prod)
-
-st.markdown('#### roc curve')
-plot_roc_curve(df_prod)
-
-st.markdown('#### confusion maxitrx')
-show_confusion_matrix(df_prod)
-
-st.markdown('#### dataframe')
 st.dataframe(df_prod)
-
-
-
